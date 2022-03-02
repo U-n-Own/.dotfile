@@ -1,0 +1,10 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MissingModuleNotification = exports.ElectronNotSupportedNotification = void 0;
+const ElectronNotSupportedNotification = 'Core/electronNotSupported';
+exports.ElectronNotSupportedNotification = ElectronNotSupportedNotification;
+const MissingModuleNotification = 'Core/missingModule';
+exports.MissingModuleNotification = MissingModuleNotification;

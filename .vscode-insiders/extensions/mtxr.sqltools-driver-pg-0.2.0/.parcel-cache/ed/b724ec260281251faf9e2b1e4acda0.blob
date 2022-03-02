@@ -1,0 +1,44 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createLogger = createLogger;
+exports.default = void 0;
+
+/**
+ * Export logger based on environment.
+ *
+ * When inside of VSCode, use extension output channel,
+ * Otherwise write to console.log/stdout.
+ *
+ * logs when in LS: language server output channel
+ * logs on webviews: webview devtools
+  */
+let logger;
+
+const isVSCodeContext = () => {
+  try {
+    require.resolve('vscode');
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+if (process.env.PRODUCT === 'ext' && isVSCodeContext()) {
+  logger = require('./lib/vscode').default;
+} else {
+  logger = require('./lib/general').default;
+}
+
+function createLogger(ns, bindings = {}) {
+  if (!ns) return logger;
+  return logger.child({ ...bindings,
+    ns
+  });
+}
+
+var _default = logger;
+exports.default = _default;

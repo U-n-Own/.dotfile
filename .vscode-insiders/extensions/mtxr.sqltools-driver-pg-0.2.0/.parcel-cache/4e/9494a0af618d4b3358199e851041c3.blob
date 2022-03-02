@@ -1,0 +1,19 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.NotifyResponseError = void 0;
+
+var _vscodeLanguageserver = require("vscode-languageserver");
+
+class NotifyResponseError extends _vscodeLanguageserver.ResponseError {
+  constructor(code, message, data) {
+    super(code, message, data);
+  }
+
+}
+
+exports.NotifyResponseError = NotifyResponseError;
+var _default = NotifyResponseError;
+exports.default = _default;

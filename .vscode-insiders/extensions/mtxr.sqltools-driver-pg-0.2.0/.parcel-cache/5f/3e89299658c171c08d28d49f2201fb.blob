@@ -1,0 +1,39 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _stream = require("stream");
+
+var _vscode = require("vscode");
+
+var _factory = _interopRequireDefault(require("./factory"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+if (process.env.PRODUCT !== 'ext') {
+  throw 'Cant use outputchannels outside of VSCode context';
+}
+
+const outputChannel = _vscode.window.createOutputChannel(process.env.DISPLAY_NAME || 'SQLTools');
+
+const writableStream = new _stream.Writable({
+  write: (chunk, _, done) => {
+    outputChannel.append(chunk.toString(chunk.encoding || 'utf8'));
+    done();
+  },
+  writev: (chunks, done) => {
+    chunks.forEach(i => outputChannel.append(i.chunk.toString(i.encoding || 'utf8')));
+    done();
+  }
+});
+const logger = (0, _factory.default)({}, writableStream);
+logger.clear = outputChannel.clear.bind(outputChannel);
+logger.outputChannel = outputChannel;
+
+logger.show = () => outputChannel.show();
+
+var _default = logger;
+exports.default = _default;

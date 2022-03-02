@@ -1,0 +1,87 @@
+{
+	"name": "vscode-evernote",
+	"displayName": "Evernote",
+	"description": "Open & update your evernote in markdown",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rhapsodyn/vscode-evernote.git"
+	},
+	"icon": "images/evernote.png",
+	"homepage": "https://github.com/rhapsodyn/vscode-evernote",
+	"version": "0.1.2",
+	"publisher": "rhapsodyn",
+	"engines": {
+		"vscode": "^1.10.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:extension.navToOneNote",
+		"onCommand:extension.openDevPage"
+	],
+	"main": "./extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.navToOneNote",
+				"title": "Evernote: Open Note"
+			},
+			{
+				"command": "extension.updateNote",
+				"title": "Evernote: Update Note"
+			},
+			{
+				"command": "extension.openDevPage",
+				"title": "Evernote: Open Developer Page"
+			}
+		],
+		"configuration": {
+			"title": "Evernote Configuration",
+			"type": "object",
+			"properties": {
+				"evernote.token": {
+					"type": "string",
+					"default": "",
+					"description": "Copy your Developer Token from the website. (Everntoe: Open Developer Page)"
+				},
+				"evernote.noteStoreUrl": {
+					"type": "string",
+					"default": "",
+					"description": "Copy your NoteStore URL from the website. (Evernote: Open Developer Page)"
+				},
+				"evernote.showTips": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show some tips??"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^2.0.3",
+		"vscode": "^1.0.0",
+		"mocha": "^2.3.3",
+		"eslint": "^3.6.0",
+		"@types/node": "^6.0.40",
+		"@types/mocha": "^2.2.32"
+	},
+	"dependencies": {
+		"evernote": "^2.0.1-beta",
+		"marked": "^0.3.6",
+		"open": "0.0.5",
+		"to-markdown": "^3.0.3"
+	},
+	"__metadata": {
+		"id": "fa6a5e07-3ff2-4150-a42c-9f78304db8f9",
+		"publisherId": "a95c7b2e-6a2c-4e91-9081-1a301ade3910",
+		"publisherDisplayName": "rhapsodyn",
+		"isPreReleaseVersion": false,
+		"preRelease": false,
+		"installedTimestamp": 1645117830440
+	}
+}

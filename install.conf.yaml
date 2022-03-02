@@ -1,0 +1,23 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- clean: ['~']
+
+- link:
+    ~/.vimrc: vimrc
+    ~/.zshrc: zshrc
+    ~/.dotfiles: ''
+    ~/.emacs.d:
+    ~/.emacs:
+    ~/.gitconfig:
+    ~/.zprofile:
+    ~/.Xauthority:
+
+- create:
+    - ~/downloads
+    - ~/.vim/undo-history
+
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]

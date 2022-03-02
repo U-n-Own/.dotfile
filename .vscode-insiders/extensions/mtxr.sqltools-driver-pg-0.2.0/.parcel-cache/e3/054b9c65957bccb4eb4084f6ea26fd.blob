@@ -1,0 +1,267 @@
+// modules are defined as an array
+// [ module function, map of requires ]
+//
+// map of requires is short require name -> numeric require
+//
+// anything defined in a previous bundle is accessed via the
+// orig method which is the require for previous bundles
+
+(function(modules, cache, entry, globalName) {
+  /* eslint-disable no-undef */
+  var globalObject =
+    typeof globalThis !== 'undefined'
+      ? globalThis
+      : typeof self !== 'undefined'
+      ? self
+      : typeof window !== 'undefined'
+      ? window
+      : typeof global !== 'undefined'
+      ? global
+      : {};
+  /* eslint-enable no-undef */
+
+  // Save the require from previous bundle to this closure if any
+  var previousRequire =
+    typeof globalObject.parcelRequire === 'function' &&
+    globalObject.parcelRequire;
+  // Do not use `require` to prevent Webpack from trying to bundle this call
+  var nodeRequire =
+    typeof module !== 'undefined' &&
+    typeof module.require === 'function' &&
+    module.require.bind(module);
+
+  function newRequire(name, jumped) {
+    if (!cache[name]) {
+      if (!modules[name]) {
+        // if we cannot find the module within our internal map or
+        // cache jump to the current global require ie. the last bundle
+        // that was added to the page.
+        var currentRequire =
+          typeof parcelRequire === 'function' && parcelRequire;
+        if (!jumped && currentRequire) {
+          return currentRequire(name, true);
+        }
+
+        // If there are other bundles on this page the require from the
+        // previous one is saved to 'previousRequire'. Repeat this as
+        // many times as there are bundles until the module is found or
+        // we exhaust the require chain.
+        if (previousRequire) {
+          return previousRequire(name, true);
+        }
+
+        // Try the node require function if it exists.
+        if (nodeRequire && typeof name === 'string') {
+          return nodeRequire(name);
+        }
+
+        var err = new Error("Cannot find module '" + name + "'");
+        err.code = 'MODULE_NOT_FOUND';
+        throw err;
+      }
+
+      localRequire.resolve = resolve;
+      localRequire.cache = {};
+
+      var module = (cache[name] = new newRequire.Module(name));
+
+      modules[name][0].call(
+        module.exports,
+        localRequire,
+        module,
+        module.exports,
+        this
+      );
+    }
+
+    return cache[name].exports;
+
+    function localRequire(x) {
+      return newRequire(localRequire.resolve(x));
+    }
+
+    function resolve(x) {
+      return modules[name][1][x] || x;
+    }
+  }
+
+  function Module(moduleName) {
+    this.id = moduleName;
+    this.bundle = newRequire;
+    this.exports = {};
+  }
+
+  newRequire.isParcelRequire = true;
+  newRequire.Module = Module;
+  newRequire.modules = modules;
+  newRequire.cache = cache;
+  newRequire.parent = previousRequire;
+  newRequire.register = function(id, exports) {
+    modules[id] = [
+      function(require, module) {
+        module.exports = exports;
+      },
+      {},
+    ];
+  };
+
+  globalObject.parcelRequire = newRequire;
+
+  for (var i = 0; i < entry.length; i++) {
+    newRequire(entry[i]);
+  }
+
+  if (entry.length) {
+    // Expose entry point to Node, AMD or browser globals
+    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+    var mainExports = newRequire(entry[entry.length - 1]);
+
+    // CommonJS
+    if (typeof exports === 'object' && typeof module !== 'undefined') {
+      module.exports = mainExports;
+
+      // RequireJS
+    } else if (typeof define === 'function' && define.amd) {
+      define(function() {
+        return mainExports;
+      });
+
+      // <script>
+    } else if (globalName) {
+      this[globalName] = mainExports;
+    }
+  }
+})({"d988635fe8fdba0509e91c8a5c5b9b59":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.activate = activate;
+exports.deactivate = deactivate;
+
+var _vscode = require("vscode");
+
+var _constants = require("./constants");
+
+const {
+  publisher,
+  name
+} = require('../package.json');
+
+const driverName = 'PostgreSQL/Redshift';
+
+async function activate(extContext) {
+  const sqltools = _vscode.extensions.getExtension('mtxr.sqltools');
+
+  if (!sqltools) {
+    throw new Error('SQLTools not installed');
+  }
+
+  await sqltools.activate();
+  const api = sqltools.exports;
+  const extensionId = `${publisher}.${name}`;
+  const plugin = {
+    extensionId,
+    name: `${driverName} Plugin`,
+    type: 'driver',
+
+    async register(extension) {
+      // register ext part here
+      // postgres
+      extension.resourcesMap().set(`driver/${_constants.DRIVER_ALIASES[0].value}/icons`, {
+        active: extContext.asAbsolutePath('icons/pg/active.png'),
+        default: extContext.asAbsolutePath('icons/pg/default.png'),
+        inactive: extContext.asAbsolutePath('icons/pg/inactive.png')
+      }); // redshift
+
+      extension.resourcesMap().set(`driver/${_constants.DRIVER_ALIASES[1].value}/icons`, {
+        active: extContext.asAbsolutePath('icons/redshift/active.png'),
+        default: extContext.asAbsolutePath('icons/redshift/default.png'),
+        inactive: extContext.asAbsolutePath('icons/redshift/inactive.png')
+      });
+
+      _constants.DRIVER_ALIASES.forEach(({
+        value
+      }) => {
+        extension.resourcesMap().set(`driver/${value}/extension-id`, extensionId);
+        extension.resourcesMap().set(`driver/${value}/connection-schema`, extContext.asAbsolutePath('connection.schema.json'));
+        extension.resourcesMap().set(`driver/${value}/ui-schema`, extContext.asAbsolutePath('ui.schema.json'));
+      });
+
+      await extension.client.sendRequest('ls/RegisterPlugin', {
+        path: extContext.asAbsolutePath('out/ls/plugin.js')
+      });
+    }
+
+  };
+  api.registerPlugin(plugin);
+  return {
+    driverName,
+    parseBeforeSaveConnection: ({
+      connInfo
+    }) => {
+      const propsToRemove = ['connectionMethod', 'id', 'usePassword'];
+
+      if (connInfo.usePassword) {
+        if (connInfo.usePassword.toString().toLowerCase().includes('ask')) {
+          propsToRemove.push('password');
+        } else if (connInfo.usePassword.toString().toLowerCase().includes('empty')) {
+          connInfo.password = '';
+          propsToRemove.push('askForPassword');
+        } else if (connInfo.usePassword.toString().toLowerCase().includes('save')) {
+          propsToRemove.push('askForPassword');
+        }
+      }
+
+      propsToRemove.forEach(p => delete connInfo[p]);
+      return connInfo;
+    },
+    parseBeforeEditConnection: ({
+      connInfo
+    }) => {
+      const formData = { ...connInfo,
+        connectionMethod: 'Server and Port'
+      };
+
+      if (connInfo.socketPath) {
+        formData.connectionMethod = 'Socket File';
+      } else if (connInfo.connectString) {
+        formData.connectionMethod = 'Connection String';
+      }
+
+      if (connInfo.askForPassword) {
+        formData.usePassword = 'Ask on connect';
+        delete formData.password;
+      } else if (typeof connInfo.password === 'string') {
+        delete formData.askForPassword;
+        formData.usePassword = connInfo.password ? 'Save password' : 'Use empty password';
+      }
+
+      return formData;
+    },
+    driverAliases: _constants.DRIVER_ALIASES
+  };
+}
+
+function deactivate() {}
+},{"./constants":"985d4738c0289b901362084187233348","../package.json":"dade76933129c0a2719f106e4de36fcb"}],"985d4738c0289b901362084187233348":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DRIVER_ALIASES = void 0;
+const DRIVER_ALIASES = [{
+  displayName: 'PostgreSQL',
+  value: 'PostgreSQL'
+}, {
+  displayName: 'AWS Redshift',
+  value: 'AWS Redshift'
+}];
+exports.DRIVER_ALIASES = DRIVER_ALIASES;
+},{}],"dade76933129c0a2719f106e4de36fcb":[function(require,module,exports) {
+module.exports = JSON.parse("{\"name\":\"sqltools-driver-pg\",\"displayName\":\"SQLTools PostgreSQL/Redshift Driver\",\"description\":\"SQLTools PostgreSQL/Redshift Driver\",\"version\":\"0.1.0\",\"engines\":{\"vscode\":\"^1.42.0\"},\"publisher\":\"mtxr\",\"license\":\"MIT\",\"private\":true,\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/mtxr/vscode-sqltools.git\",\"directory\":\"packages/drivers.pg\"},\"bugs\":{\"url\":\"https://github.com/mtxr/vscode-sqltools/labels/pg\"},\"keywords\":[\"sqltools-driver\",\"postgre\",\"postgres\",\"postgresql\",\"redshift\",\"aws redshift\"],\"galleryBanner\":{\"theme\":\"dark\",\"color\":\"#333333\"},\"icon\":\"icon.png\",\"categories\":[\"Programming Languages\",\"Snippets\",\"Formatters\",\"Other\"],\"extensionDependencies\":[\"mtxr.sqltools\"],\"activationEvents\":[\"*\",\"onLanguage:sql\",\"onCommand:sqltools.*\"],\"main\":\"./out/extension.js\",\"ls\":\"./out/ls/plugin.js\",\"targets\":{\"main\":{\"context\":\"electron-renderer\",\"includeNodeModules\":{\"vscode\":false},\"engines\":{\"electron\":\">=6.x\"},\"outputFormat\":\"commonjs\"},\"ls\":{\"context\":\"node\",\"includeNodeModules\":{\"vscode\":false},\"outputFormat\":\"commonjs\",\"engines\":{\"node\":\">=10.x\"}}},\"optimizers\":{\"*.js\":[\"@parcel/optimizer-terser\"]},\"alias\":{\"pg-native\":\"pg/lib/native\"},\"scripts\":{\"clean\":\"rimraf -rf out dist *.vsix\",\"predev\":\"yarn run clean\",\"dev\":\"concurrently -k \\\"npm:watch:*\\\"\",\"prebuild\":\"yarn run clean && yarn run ts --noEmit\",\"build\":\"NODE_ENV=production concurrently \\\"npm:build:*\\\"\",\"prepackage\":\"yarn run build\",\"package\":\"vsce package --yarn -o .\",\"build:ext\":\"NODE_PATH=../../ parcel build ./src/extension.ts --target main --dist-dir out --no-cache\",\"build:ls\":\"NODE_PATH=../../ parcel build ./src/ls/plugin.ts --target ls --dist-dir out --no-cache\",\"watch:tsc\":\"yarn run ts -w --noEmit --preserveWatchOutput\",\"watch:ext\":\"NODE_PATH=../../ parcel watch ./src/extension.ts --target main --dist-dir out --no-hmr\",\"watch:ls\":\"NODE_PATH=../../ parcel watch ./src/ls/plugin.ts --target ls --dist-dir out --no-hmr\",\"ts\":\"tsc -p .\"},\"devDependencies\":{\"@parcel/optimizer-terser\":\"^2.0.0-alpha.3\",\"@sqltools/base-driver\":\"beta\",\"@types/lodash\":\"^4.14.123\",\"@types/pg\":\"^7.14.3\",\"@types/vscode\":\"^1.42.0\",\"@types/webpack-env\":\"^1.15.2\",\"concurrently\":\"^5.2.0\",\"lodash\":\"^4.17.19\",\"parcel\":\"2.0.0-beta.1\",\"pg\":\"^8.2.1\",\"rimraf\":\"^3.0.2\",\"typescript\":\"^3.7.3\",\"vsce\":\"1.77.0\"}}");
+},{}]},{},["d988635fe8fdba0509e91c8a5c5b9b59"], null)
+
+//# sourceMappingURL=extension.js.map

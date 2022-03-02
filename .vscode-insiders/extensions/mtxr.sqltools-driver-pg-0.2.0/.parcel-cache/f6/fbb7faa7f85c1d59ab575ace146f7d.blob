@@ -1,0 +1,14 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DRIVER_ALIASES = void 0;
+const DRIVER_ALIASES = [{
+  displayName: 'PostgreSQL',
+  value: 'PostgreSQL'
+}, {
+  displayName: 'AWS Redshift',
+  value: 'AWS Redshift'
+}];
+exports.DRIVER_ALIASES = DRIVER_ALIASES;

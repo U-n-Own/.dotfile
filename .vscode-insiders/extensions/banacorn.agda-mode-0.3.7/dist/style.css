@@ -1,0 +1,252 @@
+*:focus {
+  outline: none;
+}
+.agda-mode {
+  height: 100%;
+}
+.agda-mode-header-container {
+  position: fixed;
+  width: 100%;
+  left: 0;
+}
+.agda-mode-keyboard {
+  margin: 0 20px;
+  position: absolute;
+  width: calc(100% - 2.5rem);
+  min-height: 2rem;
+  background: var(--vscode-editor-background);
+}
+.agda-mode-keyboard.prompting {
+  position: relative;
+}
+.agda-mode-keyboard.deactivated {
+  display: none;
+}
+.agda-mode-keyboard .agda-mode-keyboard-sequence-and-candidates {
+  display: flex;
+  padding: 1rem 0;
+  min-height: 2rem;
+  line-height: 2rem;
+}
+.agda-mode-keyboard .agda-mode-keyboard-sequence-and-candidates .agda-mode-keyboard-sequence {
+  padding: 0rem 1rem;
+  flex-grow: 100;
+  background: var(--vscode-sideBar-background);
+  font-weight: bold;
+}
+.agda-mode-keyboard .agda-mode-keyboard-sequence-and-candidates .agda-mode-keyboard-candidates {
+  margin-left: 1rem;
+  width: calc(1.5rem * 10 + 0.2rem * 20);
+  flex-grow: 0;
+  font-weight: bold;
+}
+.agda-mode-keyboard .agda-mode-keyboard-suggestions {
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+}
+.agda-mode-keyboard .agda-mode-key {
+  align-self: center;
+  background: var(--vscode-input-background);
+  color: var(--vscode-foreground);
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  margin: 0.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.2rem;
+  text-align: center;
+}
+.agda-mode-keyboard .agda-mode-key:hover {
+  background: var(--vscode-editor-selectionBackground);
+  cursor: pointer;
+}
+.agda-mode-keyboard .agda-mode-key.selected {
+  background: var(--vscode-editor-selectionBackground);
+}
+.agda-mode-header {
+  height: 2rem;
+  margin: 0 20px;
+  padding: calc(1rem/2) 0;
+  box-shadow: var(--vscode-editor-background) 0px 3px 3px;
+  background: var(--vscode-editor-background);
+  line-height: 2rem;
+  font-size: 150%;
+  font-weight: bold;
+}
+.agda-mode-header.success {
+  color: var(--vscode-editorInfo-foreground);
+}
+.agda-mode-header.error {
+  color: var(--vscode-editorError-foreground);
+}
+.agda-mode-header.warning {
+  color: var(--vscode-editorWarning-foreground);
+}
+.agda-mode-header .agda-mode-header-status {
+  color: var(--vscode-input-placeholderForeground);
+  font-size: 50%;
+  font-variant: small-caps;
+  float: right;
+}
+.agda-mode-body {
+  padding-top: calc(2rem + 1rem);
+  white-space: pre;
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 125%;
+  line-height: 1.5rem;
+}
+.agda-mode-body .codicon {
+  vertical-align: middle;
+}
+.agda-mode-body li {
+  margin: 1rem 0;
+  padding: calc(1rem/2) 1rem;
+  display: flex;
+}
+.agda-mode-body li:first-of-type {
+  margin-top: 0;
+}
+.agda-mode-body li:hover .item-raw-button {
+  visibility: visible;
+}
+.agda-mode-body li.unlabeled-item,
+.agda-mode-body li.labeled-item {
+  background: var(--vscode-sideBar-background);
+  border-left: 0.2rem solid var(--vscode-sideBar-background);
+}
+.agda-mode-body li.header-item {
+  margin: 0;
+  padding: 0;
+}
+.agda-mode-body li.header-item h3 {
+  margin: 0;
+}
+.agda-mode-body li .item-content {
+  white-space: pre-wrap;
+  order: 1;
+  flex-grow: 1;
+}
+.agda-mode-body li .item-raw-button {
+  visibility: hidden;
+  order: 1;
+  flex-grow: 0;
+  padding-left: 1ch;
+  font-variant: small-caps;
+  text-align: right;
+  color: var(--vscode-input-placeholderForeground);
+}
+.agda-mode-body li .item-raw-button:hover {
+  cursor: pointer;
+  color: var(--vscode-activityBar-foreground);
+}
+.agda-mode-body li .item-raw-button.active {
+  visibility: visible;
+  cursor: pointer;
+  color: var(--vscode-editorWarning-foreground);
+}
+.agda-mode-body li .item-location-button {
+  order: 2;
+  flex-grow: 0;
+  padding-left: 1ch;
+  font-variant: small-caps;
+  text-align: right;
+}
+.agda-mode-body li .item-location-button:hover {
+  cursor: pointer;
+  color: var(--vscode-activityBar-foreground);
+}
+.agda-mode-body li .item-label {
+  order: 2;
+  margin-left: calc(1rem/2);
+  font-variant: small-caps;
+  font-weight: bolder;
+  text-align: right;
+}
+.agda-mode-body li.special .item-label {
+  color: var(--vscode-editorInfo-foreground);
+}
+.agda-mode-body li.special {
+  border-color: var(--vscode-editorInfo-foreground);
+}
+.agda-mode-body li.warning .item-label {
+  color: var(--vscode-editorWarning-foreground);
+}
+.agda-mode-body li.warning {
+  border-color: var(--vscode-editorWarning-foreground);
+}
+.agda-mode-body li.error .item-label {
+  color: var(--vscode-editorError-foreground);
+}
+.agda-mode-body li.error {
+  border-color: var(--vscode-editorError-foreground);
+}
+.agda-mode-body ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+}
+.agda-mode-prompt {
+  white-space: pre;
+  padding: 0 1rem 1rem 1rem;
+}
+.agda-mode-prompt input {
+  width: calc(100% - 1rem * 2);
+  font-size: 150%;
+  padding: 1rem;
+  height: 1rem;
+  background-color: var(--vscode-input-background);
+  border: none;
+  color: var(--vscode-input-foreground);
+}
+.agda-mode-prompt input::-webkit-input-placeholder {
+  color: var(--vscode-input-placeholderForeground);
+}
+.component-link {
+  color: var(--vscode-button-foreground);
+}
+.component-link .codicon-link::after {
+  content: " ";
+  white-space: pre;
+}
+.component-link.component-hole,
+.component-link.component-location {
+  color: var(--vscode-textLink-foreground);
+}
+.component-link:hover {
+  color: var(--vscode-button-foreground);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.component-link:hover.component-hole,
+.component-link:hover.component-location {
+  color: var(--vscode-textLink-activeForeground);
+}
+.component-horz {
+  display: inline-flex;
+  flex-wrap: wrap;
+  padding-left: calc(2ch - 1ch);
+}
+.component-horz-item:first-of-type {
+  margin-left: calc(1ch - 2ch);
+}
+.component-horz-item {
+  margin-left: 1ch;
+}
+.component-horz-item.compact {
+  margin-left: 0;
+}
+.component-parentheses {
+  color: var(--vscode-input-placeholderForeground);
+}
+.component-parentheses.activated {
+  cursor: ew-resize;
+  color: var(--vscode-editorWarning-foreground);
+  font-weight: bolder;
+}
+.delimiter {
+  color: var(--vscode-input-placeholderForeground);
+}

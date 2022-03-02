@@ -1,0 +1,126 @@
+{
+	"name": "codegenx",
+	"publisher": "DeepGenX",
+	"displayName": "CodeGenX",
+	"description": "CodeGenX - A code autocompletion tool based on GPT-J",
+	"license": "SEE LICENSE IN LICENSE",
+	"homepage": "https://github.com/DeepGenX/CodeGenX",
+	"author": {
+		"name": "DeepGenX",
+		"email": "deepgenx@gmail.com",
+		"url": "https://deepgenx.com"
+	},
+	"keywords": [
+		"generation",
+		"code",
+		"copilot",
+		"deepgenx",
+		"autocomplete",
+		"completion",
+		"codegenx",
+		"open-source"
+	],
+	"qna": "https://github.com/DeepGenX/CodeGenX/discussions/categories/q-a",
+	"bugs": {
+		"url": "https://github.com/DeepGenX/CodeGenX/issues",
+		"email": "deepgenx@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DeepGenX/CodeGenX"
+	},
+	"icon": "assets/logo.ico",
+	"version": "0.1.4",
+	"engines": {
+		"vscode": "^1.57.0"
+	},
+	"categories": [
+		"Other",
+		"Machine Learning",
+		"Data Science",
+		"Programming Languages"
+	],
+	"activationEvents": [
+		"onCommand:codegenx.open_CodeGenX"
+	],
+	"main": "./src/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"title": "CodeGenX: Get AI Completion",
+				"command": "codegenx.open_CodeGenX"
+			}
+		],
+		"configuration": [
+			{
+				"title": "CodeGenX",
+				"properties": {
+					"Codegenx.Temperature": {
+						"type": "number",
+						"default": 1,
+						"description": "The temperature parameter of the GPT-J model"
+					},
+					"Codegenx.Top_P": {
+						"type": "number",
+						"default": 0.7,
+						"description": "The top_p parameter of the GPT-J model"
+					},
+					"Codegenx.MaxLength": {
+						"type": "string",
+						"enum": [
+							"128 (fast)",
+							"264 (medium)",
+							"512 (slow)"
+						],
+						"default": "128 (fast)",
+						"description": "The max length of the output. The longer the output the slower the inference."
+					},
+					"Codegenx.Token": {
+						"type": "string",
+						"description": "The token used to make API calls."
+					}
+				}
+			}
+		],
+		"keybindings": [
+			{
+				"command": "codegenx.open_CodeGenX",
+				"key": "ctrl+d",
+				"mac": "cmd+d"
+			}
+		]
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js",
+		"vscode:prepublish": "npm run esbuild-base -- --minify",
+		"esbuild-base": "esbuild ./src/extension.js --bundle --external:vscode --format=cjs --platform=node",
+		"esbuild": "npm run esbuild-base -- --sourcemap",
+		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.2.2",
+		"@types/node": "14.x",
+		"@types/vscode": "^1.57.0",
+		"esbuild": "^0.13.12",
+		"eslint": "^7.27.0",
+		"glob": "^7.1.7",
+		"mocha": "^8.4.0",
+		"typescript": "^4.3.2",
+		"vscode-test": "^1.5.2"
+	},
+	"dependencies": {
+		"axios": "^0.24.0",
+		"vsce": "^1.100.2"
+	},
+	"__metadata": {
+		"id": "3a3e7e3f-47f6-4548-bca7-e923f746ed0d",
+		"publisherId": "1695b458-922f-44af-b5ed-7636a66e3828",
+		"publisherDisplayName": "DeepGenX",
+		"isPreReleaseVersion": false,
+		"preRelease": false,
+		"installedTimestamp": 1645917760702
+	}
+}

@@ -1,0 +1,26 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.ElectronNotSupportedError = void 0;
+
+var _responseError = _interopRequireDefault(require("./response-error"));
+
+var _notification = require("../notification");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class ElectronNotSupportedError extends _responseError.default {
+  constructor(message = `Electron is not supported. You should enable \'sqltools.useNodeRuntime\' and have NodeJS installed to continue.`) {
+    super(1001, message, {
+      notification: _notification.ElectronNotSupportedNotification,
+      dontNotify: true
+    });
+  }
+
+}
+
+exports.ElectronNotSupportedError = ElectronNotSupportedError;
+var _default = ElectronNotSupportedError;
+exports.default = _default;

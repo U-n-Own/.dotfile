@@ -1,0 +1,68 @@
+{
+	"name": "darkpp-regular",
+	"version": "0.0.4",
+	"description": "Enhanced VSCode Dark+ theme with support for Fira Code & Hasklig.",
+	"author": "miZyind <miZyind@gmail.com>",
+	"license": "MIT",
+	"icon": "assets/icon.png",
+	"publisher": "miZyind",
+	"displayName": "Dark++ Regular",
+	"homepage": "https://github.com/miZyind/vscode-darkpp-regular/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/miZyind/vscode-darkpp-regular"
+	},
+	"bugs": {
+		"url": "https://github.com/miZyind/vscode-darkpp-regular/issues"
+	},
+	"engines": {
+		"vscode": "^1.22.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"keywords": [
+		"vscode",
+		"theme",
+		"dark",
+		"regular"
+	],
+	"galleryBanner": {
+		"color": "#282C34",
+		"theme": "dark"
+	},
+	"contributes": {
+		"themes": [
+			{
+				"label": "Dark++ Regular",
+				"uiTheme": "vs-dark",
+				"path": "./themes/Dark++ Regular-color-theme.json"
+			}
+		]
+	},
+	"badges": [
+		{
+			"url": "https://vsmarketplacebadge.apphb.com/version-short/mizyind.darkpp-regular.svg",
+			"href": "https://marketplace.visualstudio.com/items/miZyind.darkpp-regular",
+			"description": "Version"
+		},
+		{
+			"url": "https://vsmarketplacebadge.apphb.com/installs-short/mizyind.darkpp-regular.svg",
+			"href": "https://marketplace.visualstudio.com/items/miZyind.darkpp-regular",
+			"description": "Installs"
+		},
+		{
+			"url": "https://vsmarketplacebadge.apphb.com/rating-short/mizyind.darkpp-regular.svg",
+			"href": "https://marketplace.visualstudio.com/items/miZyind.darkpp-regular",
+			"description": "Rating"
+		}
+	],
+	"__metadata": {
+		"id": "bad3f226-6565-4797-b979-1a86c14bcad8",
+		"publisherId": "76a9304c-36c1-4545-bfd6-675d4e633b81",
+		"publisherDisplayName": "miZyind",
+		"isPreReleaseVersion": false,
+		"preRelease": false,
+		"installedTimestamp": 1645117825792
+	}
+}

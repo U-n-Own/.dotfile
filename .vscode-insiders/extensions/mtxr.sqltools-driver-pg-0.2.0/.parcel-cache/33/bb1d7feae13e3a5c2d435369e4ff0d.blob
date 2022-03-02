@@ -1,0 +1,310 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _pg = require("pg");
+
+var _queries = _interopRequireDefault(require("./queries"));
+
+var _types = require("@sqltools/types");
+
+var _baseDriver = _interopRequireDefault(require("@sqltools/base-driver"));
+
+var _fs = _interopRequireDefault(require("fs"));
+
+var _zipObject = _interopRequireDefault(require("lodash/zipObject"));
+
+var _query = require("@sqltools/util/query");
+
+var _internalId = _interopRequireDefault(require("@sqltools/util/internal-id"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+const rawValue = v => v;
+
+_pg.types.setTypeParser(_pg.types.builtins.TIMESTAMP || 1114, rawValue);
+
+_pg.types.setTypeParser(_pg.types.builtins.TIMESTAMPTZ || 1184, rawValue);
+
+_pg.types.setTypeParser(_pg.types.builtins.DATE || 1082, rawValue);
+
+class PostgreSQL extends _baseDriver.default {
+  constructor(...args) {
+    super(...args);
+
+    _defineProperty(this, "queries", _queries.default);
+
+    _defineProperty(this, "query", (query, opt = {}) => {
+      const messages = [];
+      let cli;
+      const {
+        requestId
+      } = opt;
+      return this.open().then(async pool => {
+        cli = await pool.connect();
+        cli.on('notice', notice => messages.push(this.prepareMessage(`${notice.name.toUpperCase()}: ${notice.message}`)));
+        const results = await cli.query({
+          text: query.toString(),
+          rowMode: 'array'
+        });
+        cli.release();
+        return results;
+      }).then(results => {
+        const queries = (0, _query.parse)(query.toString(), 'pg');
+
+        if (!Array.isArray(results)) {
+          results = [results];
+        }
+
+        return results.map((r, i) => {
+          const cols = this.getColumnNames(r.fields || []);
+          return {
+            requestId,
+            resultId: (0, _internalId.default)(),
+            connId: this.getId(),
+            cols,
+            messages: messages.concat([this.prepareMessage(`${r.command} successfully executed.${r.command.toLowerCase() !== 'select' && typeof r.rowCount === 'number' ? ` ${r.rowCount} rows were affected.` : ''}`)]),
+            query: queries[i],
+            results: this.mapRows(r.rows, cols)
+          };
+        });
+      }).catch(err => {
+        cli && cli.release();
+        return [{
+          connId: this.getId(),
+          requestId,
+          resultId: (0, _internalId.default)(),
+          cols: [],
+          messages: messages.concat([this.prepareMessage([err && err.message || err, err && err.routine === 'scanner_yyerror' && err.position ? `at character ${err.position}` : undefined].filter(Boolean).join(' '))]),
+          error: true,
+          rawError: err,
+          query,
+          results: []
+        }];
+      });
+    });
+
+    _defineProperty(this, "completionsCache", null);
+
+    _defineProperty(this, "getStaticCompletions", async () => {
+      if (this.completionsCache) return this.completionsCache;
+      this.completionsCache = {};
+      const items = await this.queryResults('SELECT UPPER(word) AS label, UPPER(catdesc) AS desc FROM pg_get_keywords();');
+      items.forEach(item => {
+        this.completionsCache[item.label] = {
+          label: item.label,
+          detail: item.label,
+          filterText: item.label,
+          sortText: (['SELECT', 'CREATE', 'UPDATE', 'DELETE'].includes(item.label) ? '2:' : '') + item.label,
+          documentation: {
+            value: `\`\`\`yaml\nWORD: ${item.label}\nTYPE: ${item.desc}\n\`\`\``,
+            kind: 'markdown'
+          }
+        };
+      });
+      return this.completionsCache;
+    });
+  }
+
+  async open() {
+    if (this.connection) {
+      return this.connection;
+    }
+
+    try {
+      const {
+        ssl,
+        ...pgOptions
+      } = this.credentials.pgOptions || {};
+      let poolConfig = {
+        connectionTimeoutMillis: Number(`${this.credentials.connectionTimeout || 0}`) * 1000,
+        ...pgOptions
+      };
+
+      if (this.credentials.connectString) {
+        poolConfig = {
+          connectionString: this.credentials.connectString,
+          ...poolConfig
+        };
+      } else {
+        poolConfig = {
+          database: this.credentials.database,
+          host: this.credentials.server,
+          password: this.credentials.password,
+          port: this.credentials.port,
+          user: this.credentials.username,
+          ...poolConfig
+        };
+      }
+
+      if (ssl) {
+        if (typeof ssl === 'object') {
+          const useSsl = { ...ssl
+          };
+          ['ca', 'key', 'cert', 'pfx'].forEach(key => {
+            if (!useSsl[key]) {
+              delete useSsl[key];
+              return;
+            }
+
+            ;
+            this.log.info(`Reading file ${useSsl[key].replace(/^file:\/\//, '')}`);
+            useSsl[key] = _fs.default.readFileSync(useSsl[key].replace(/^file:\/\//, '')).toString();
+          });
+
+          if (Object.keys(useSsl).length > 0) {
+            poolConfig.ssl = useSsl;
+          }
+        } else {
+          poolConfig.ssl = ssl || false;
+        }
+      }
+
+      const pool = new _pg.Pool(poolConfig);
+      const cli = await pool.connect();
+      cli.release();
+      this.connection = Promise.resolve(pool);
+      return this.connection;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async close() {
+    if (!this.connection) return Promise.resolve();
+    const pool = await this.connection;
+    this.connection = null;
+    pool.end();
+  }
+
+  getColumnNames(fields) {
+    return fields.reduce((names, {
+      name
+    }) => {
+      const count = names.filter(n => n === name).length;
+      return names.concat(count > 0 ? `${name} (${count})` : name);
+    }, []);
+  }
+
+  mapRows(rows, columns) {
+    return rows.map(r => (0, _zipObject.default)(columns, r));
+  }
+
+  async getColumns(parent) {
+    const results = await this.queryResults(this.queries.fetchColumns(parent));
+    return results.map(col => ({ ...col,
+      iconName: col.isPk ? 'pk' : col.isFk ? 'fk' : null,
+      childType: _types.ContextValue.NO_CHILD,
+      table: parent
+    }));
+  }
+
+  async testConnection() {
+    const pool = await this.open();
+    const cli = await pool.connect();
+    await cli.query('SELECT 1');
+    cli.release();
+  }
+
+  async getChildrenForItem({
+    item,
+    parent
+  }) {
+    switch (item.type) {
+      case _types.ContextValue.CONNECTION:
+      case _types.ContextValue.CONNECTED_CONNECTION:
+        return this.queryResults(this.queries.fetchDatabases());
+
+      case _types.ContextValue.TABLE:
+      case _types.ContextValue.VIEW:
+      case _types.ContextValue.MATERIALIZED_VIEW:
+        return this.getColumns(item);
+
+      case _types.ContextValue.DATABASE:
+        return [{
+          label: 'Schemas',
+          type: _types.ContextValue.RESOURCE_GROUP,
+          iconId: 'folder',
+          childType: _types.ContextValue.SCHEMA
+        }];
+
+      case _types.ContextValue.RESOURCE_GROUP:
+        return this.getChildrenForGroup({
+          item,
+          parent
+        });
+
+      case _types.ContextValue.SCHEMA:
+        return [{
+          label: 'Tables',
+          type: _types.ContextValue.RESOURCE_GROUP,
+          iconId: 'folder',
+          childType: _types.ContextValue.TABLE
+        }, {
+          label: 'Views',
+          type: _types.ContextValue.RESOURCE_GROUP,
+          iconId: 'folder',
+          childType: _types.ContextValue.VIEW
+        }, {
+          label: 'Materialized Views',
+          type: _types.ContextValue.RESOURCE_GROUP,
+          iconId: 'folder',
+          childType: _types.ContextValue.MATERIALIZED_VIEW
+        }, {
+          label: 'Functions',
+          type: _types.ContextValue.RESOURCE_GROUP,
+          iconId: 'folder',
+          childType: _types.ContextValue.FUNCTION
+        }];
+    }
+
+    return [];
+  }
+
+  async getChildrenForGroup({
+    parent,
+    item
+  }) {
+    switch (item.childType) {
+      case _types.ContextValue.SCHEMA:
+        return this.queryResults(this.queries.fetchSchemas(parent));
+
+      case _types.ContextValue.TABLE:
+        return this.queryResults(this.queries.fetchTables(parent));
+
+      case _types.ContextValue.VIEW:
+        return this.queryResults(this.queries.fetchViews(parent));
+
+      case _types.ContextValue.MATERIALIZED_VIEW:
+        return this.queryResults(this.queries.fetchMaterializedViews(parent));
+
+      case _types.ContextValue.FUNCTION:
+        return this.queryResults(this.queries.fetchFunctions(parent));
+    }
+
+    return [];
+  }
+
+  searchItems(itemType, search, extraParams = {}) {
+    switch (itemType) {
+      case _types.ContextValue.TABLE:
+        return this.queryResults(this.queries.searchTables({
+          search
+        }));
+
+      case _types.ContextValue.COLUMN:
+        return this.queryResults(this.queries.searchColumns({
+          search,
+          ...extraParams
+        }));
+    }
+  }
+
+}
+
+exports.default = PostgreSQL;
