@@ -1,1 +1,0 @@
-psql -U postgres -f signature.sql -t -o signature.json postgres
