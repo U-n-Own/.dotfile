@@ -6,13 +6,15 @@
 - clean: ['~']
 
 - link:
-    ~/.zshrc: zshrc
-    ~/.dotfiles: ''
-    ~/.emacs.d:
-    ~/.zprofile:
+   ~/.zshrc: zshrc
+   ~/.dotfiles: ''
+   ~/.emacs.d:
+   ~/.zprofile:
+   ~/.p10k.zsh:
+   ~/.zsh_history:
 
 - create:
     - ~/downloads
 
-- shell:
-  - [git submodule update --init --recursive, Installing submodules]
+#- shell:
+#  - [git submodule update --init --recursive, Installing submodules]
