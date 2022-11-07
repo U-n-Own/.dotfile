@@ -1,4 +1,4 @@
-#Dotfiles configuration maintained with GNU Stow
+# Dotfiles configuration maintained with GNU Stow
 
 
 
@@ -31,4 +31,14 @@ stow <dotfile>
 - [oh-my-zsh]
 - [neovim]
 - and more...
+
+
+## Screenshots
+
+![btop](/Screenshots/'Mon Nov  7 06:26:23 PM CET 2022)
+
+![girl](/Screenshots/'Mon Nov  7 06:26:27 PM CET 2022)
+
+
+
 
