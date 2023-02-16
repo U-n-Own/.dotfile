@@ -3,26 +3,39 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-export PATH="$HOME/.emacs.d/bin:$PATH"
-# For xmonad
-export PATH="$PATH:$HOME/bin"
 
-
-
-
+#Add gems to path
+export PATH=$PATH:/vincentkun/.local/share/gem/ruby/3.0.0/bin
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loadedH, run: echo $RANDOM_THEME
+# to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+#ZSH_THEME="robbyrussell"
 
-# Old theme
-# ZSH_THEME="robbyrussell"
+#ZSH_THEME="agnoster"
+#ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Theme di prova
-#ZSH_THEME="duellj"
+# Typwritten: https://typewritten.dev/#/installation; Dracula compliment, purple based
 
-# Powerlevel10k like
-ZSH_THEME="agnoster"
+# Check if typewritten is installed
+if [ -d "$ZSH_CUSTOM/themes/typewritten" ]; then
+  ZSH_THEME=""
+else
+  ZSH_THEME="agnoster"
+fi
+
+
+ZSH_THEME=""
+
+export TYPEWRITTEN_SYMBOL="  λ "
+export DRACULA_TYPEWRITTEN_COLOR_MAPPINGS="primary:#d5ccff;secondary:#9580ff;info_neutral_1:#d0ffcc;info_neutral_2:#ffffcc;info_special:#ff9580;info_negative:#ff5555;notice:#ffff80;accent:#d5ccff"
+export TYPEWRITTEN_COLOR_MAPPINGS="${DRACULA_TYPEWRITTEN_COLOR_MAPPINGS}"
+export TYPEWRITTEN_PROMPT_LAYOUT="half_pure"
+
+
+fpath+=$HOME/.zsh/typewritten
+autoload -U promptinit; promptinit
+prompt typewritten
 
 
 # Set list of themes to pick from when loading at random
@@ -41,7 +54,7 @@ ZSH_THEME="agnoster"
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # JUST remind me to update when it's time
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
 # zstyle ':omz:update' frequency 13
@@ -85,11 +98,21 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git archlinux zsh-syntax-highlighting zsh-interactive-cd timer zsh-autosuggestions web-search sudo dirhistory vscode themes python gitfast zsh-history-substring-search fzf bgnotify)
+
+plugins=(git archlinux zsh-syntax-highlighting zsh-interactive-cd timer zsh-autosuggestions web-search sudo dirhistory vscode themes python gitfast zsh-history-substring-search fzf bgnotify zsh_codex)
+
+#Bind ^X to zsh_codex
+
+#plugins=(zsh_codex)
+bindkey '^X' create_completion
+
+
+
+#plugins=(git)
+
 
 source $ZSH/oh-my-zsh.sh
-source ~/.fx-autocomplete.sh
-source .zprofile
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -104,11 +127,6 @@ source .zprofile
 #   export EDITOR='mvim'
 # fi
 
-#Editor setup by me:
-#vim
-export EDITOR='vim'
-
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -117,9 +135,11 @@ export EDITOR='vim'
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 #
-# Example aliases
+alias rm='rm -i'
+alias ll='ls -al'
+alias grep='grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
